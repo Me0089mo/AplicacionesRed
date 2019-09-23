@@ -5,28 +5,23 @@
  */
 package buscaminas;
 
+import java.net.Socket;
+
 /**
  *
  * @author Memo
  */
 public class SetDifficulty extends javax.swing.JFrame {
 
-    public int dificulty;
+    private static Conection con;
+    private static Socket cl;
     /**
      * Creates new form Interfaz
      */
-    public SetDifficulty() {
+    public SetDifficulty(Conection con, Socket cl) {
+        this.con=con;
+        this.cl=cl;
         initComponents();
-        if(rbFacil.isSelected())
-            dificulty=1;
-        else if(rbMedio.isSelected())
-            dificulty=2;
-        else
-            dificulty=3;
-    }
-    
-    public int getDificulty(){
-        return dificulty;
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -42,6 +37,7 @@ public class SetDifficulty extends javax.swing.JFrame {
         rbMedio = new javax.swing.JRadioButton();
         rbExperto = new javax.swing.JRadioButton();
         jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -57,18 +53,30 @@ public class SetDifficulty extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setText("Dificultad");
 
+        jButton1.setText("Comenzar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(47, 47, 47)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(rbExperto)
-                    .addComponent(rbFacil, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jLabel1)
-                        .addComponent(rbMedio)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(47, 47, 47)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(rbExperto)
+                            .addComponent(rbFacil, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel1)
+                                .addComponent(rbMedio))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(58, 58, 58)
+                        .addComponent(jButton1)))
                 .addContainerGap(59, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -82,11 +90,28 @@ public class SetDifficulty extends javax.swing.JFrame {
                 .addComponent(rbMedio)
                 .addGap(18, 18, 18)
                 .addComponent(rbExperto)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        int dificulty;
+        if(rbFacil.isSelected())
+            dificulty=1;
+        else if(rbMedio.isSelected())
+            dificulty=2;
+        else
+            dificulty=3;
+        con.setDifficulty(cl, dificulty);
+        con.disconnect(cl);
+        Tablero tablero=new Tablero(cl, dificulty);
+        tablero.locateMines();
+        this.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -119,13 +144,14 @@ public class SetDifficulty extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new SetDifficulty().setVisible(true);
+                new SetDifficulty(con, cl).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JRadioButton rbExperto;
     private javax.swing.JRadioButton rbFacil;

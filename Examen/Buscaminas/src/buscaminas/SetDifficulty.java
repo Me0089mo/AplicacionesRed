@@ -22,6 +22,7 @@ public class SetDifficulty extends javax.swing.JFrame {
         this.con=con;
         this.cl=cl;
         initComponents();
+        this.setLocationRelativeTo(null);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -40,6 +41,7 @@ public class SetDifficulty extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setLocation(new java.awt.Point(400, 400));
 
         buttonGroup1.add(rbFacil);
         rbFacil.setText("Facil (9x9)");

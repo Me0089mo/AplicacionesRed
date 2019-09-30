@@ -1,3 +1,4 @@
-Memo 148
-Memo 96
-Memo 20
+Gorra 64
+Rana 49
+Rambo 0
+Tronco 0

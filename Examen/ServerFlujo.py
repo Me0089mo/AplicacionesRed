@@ -52,13 +52,9 @@ class Server:
 		aux = bytes()
 		alias_recv = self.cl_socket.recv(1024)
 		alias = str(alias_recv[2:len(alias_recv)], 'ascii')
-		print(alias)
-		#while cont<4:
 		puntaje = self.cl_socket.recv(1024)
 		aux = aux + puntaje
-		#cont+=1
 		punt = struct.unpack('>i', aux)
-		print(punt[0])
 		self.saveRecords(alias, punt[0], difficulty)
 		self.cl_socket.close()
 
@@ -97,9 +93,9 @@ class Server:
 		tamTabla = len(tabla).to_bytes(4,  byteorder="big")
 		self.cl_socket.sendall(tamTabla)
 		for x in tabla:
-			self.cl_socket.sendall(bytes(x["name"], 'utf-8'))
+			user_env = bytes(x["name"], 'utf-8')
+			self.cl_socket.send(user_env)
 			punt_env = int(x["puntaje"]).to_bytes(4,  byteorder="big")
-			print(punt_env)
 			self.cl_socket.sendall(punt_env)
 		#Actualizando el archivo de puntajes
 		file_u = open(fileName, 'w')
@@ -108,9 +104,6 @@ class Server:
 			final.append(aux)
 		file_u.writelines(final)
 		file_u.close()
-		print(final)
-
-	#def chargeRecords(self):
 
 
 server = Server()
@@ -120,6 +113,4 @@ while True:
 	server.listen()  
 	server.generate_map(dif)
 	server.listen()
-	server.puntuationRecord(dif)
-#sc.close()  
-#s.close()  
+	server.puntuationRecord(dif) 

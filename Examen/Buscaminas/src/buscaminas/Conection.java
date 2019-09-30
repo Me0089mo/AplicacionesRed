@@ -80,7 +80,7 @@ public class Conection {
     public ScoreBoard scoreBoard(Socket cl, String alias, int puntuation){
         try{
             int[] puntajes=new int[10];
-            byte[] nombre=new byte[10]; 
+            byte[] nombre=new byte[25]; 
             String[] names=new String[10];
             DataOutputStream dos=new DataOutputStream(cl.getOutputStream());
             DataInputStream dis=new DataInputStream(cl.getInputStream());
@@ -89,14 +89,14 @@ public class Conection {
             dos.writeInt(puntuation);
             dos.flush();
             int numPuntajes=dis.readInt();
-            System.out.println(numPuntajes);
+            //System.out.println(numPuntajes);
             for(int i=0; i<numPuntajes; i++){
                 dis.read(nombre);
                 String aux=new String(nombre);
                 names[i] = aux;
                 puntajes[i]=dis.readInt();
-                nombre = new byte[10];
-                System.out.println(names[i]+"\t"+puntajes[i]);
+                nombre = new byte[25];
+                //System.out.println(names[i]+"\t"+puntajes[i]);
             }
             dos.close();
             dis.close();
@@ -104,7 +104,6 @@ public class Conection {
             return sc;
         }catch(Exception e){
             e.printStackTrace();
-            //ScoreBoard sc = null;
             return null;
         }
     }

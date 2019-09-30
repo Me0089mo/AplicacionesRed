@@ -1,22 +1,13 @@
 package buscaminas;
 
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.net.Socket;
 import java.net.URL;
-import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.plaf.basic.BasicBorders;
 
 /**
  *
@@ -29,7 +20,8 @@ public class Tablero extends JFrame{
     private int noMinas, noButton=1, bandCount;
     private int[] minas;
     private JFrame tablero;
-    private ImageIcon img_mina, img_bandera;
+    private ImageIcon img_mina, img_bandera, img_transparente;
+    private JLabel banderas;
     
     public Tablero(){}
     public Tablero(Socket cl, int level){
@@ -39,6 +31,9 @@ public class Tablero extends JFrame{
         resource = Tablero.class.getResource("/images/bandera.jpg");
         img_aux = new ImageIcon(resource);
         img_bandera = new ImageIcon(img_aux.getImage().getScaledInstance(15, 15, java.awt.Image.SCALE_DEFAULT));
+        resource = Tablero.class.getResource("/images/transparente.jpg");
+        img_aux = new ImageIcon(resource);
+        img_transparente = new ImageIcon(img_aux.getImage().getScaledInstance(15, 15, java.awt.Image.SCALE_DEFAULT));
         bandCount = 10;
         this.cl = cl;
         if(level==1){
@@ -64,18 +59,30 @@ public class Tablero extends JFrame{
     public void generateTablero(int imax, int jmax, String nivel){
         tablero=new JFrame("Buscaminas");
         tablero.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);       
-        if(imax == 9)
-            tablero.setSize(250, 295);  
-        else if(imax == 16)
-            tablero.setSize(390, 410);
-        else
-            tablero.setSize(390, 780);
-        tablero.setLayout(null);
-        tablero.validate();
-        Container containerTab=tablero.getContentPane();
         JLabel label=new JLabel();
+        JLabel band_img = new JLabel(img_bandera);
+        banderas=new JLabel();
+        if(imax == 9){
+            tablero.setSize(250, 295);
+            label.setBounds(75, 10, 150, 20);
+            band_img.setBounds(160, 5, 40, 30);
+            banderas.setBounds(200, 5, 40, 30);
+        }
+        else if(imax == 16){
+            tablero.setSize(390, 410);
+            label.setBounds(125, 10, 150, 20);
+            band_img.setBounds(280, 5, 40, 30);
+            banderas.setBounds(320, 5, 40, 30);
+        }
+        else{
+            tablero.setSize(390, 700);
+            label.setBounds(135, 10, 150, 20);
+            band_img.setBounds(280, 5, 40, 30);
+            banderas.setBounds(320, 5, 40, 30);
+        }
+        tablero.setLayout(null);
+        Container containerTab=tablero.getContentPane();
         label.setText(nivel);
-        label.setBounds(100, 10, 150, 20);
         containerTab.add(label, -1);
         JButton btn;
         for(int i=0; i<imax; i++){
@@ -85,6 +92,10 @@ public class Tablero extends JFrame{
                 containerTab.add(btn, -1);
             }
         }
+        containerTab.add(band_img, -1);
+        banderas.setText("X "+bandCount);
+        containerTab.add(banderas);
+        tablero.setLocationRelativeTo(null);
         tablero.setVisible(true);
     }
     
@@ -104,7 +115,6 @@ public class Tablero extends JFrame{
         ml = new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
-                //int minasAlrededor=0;
                 int casilla = Integer.parseInt(btn.getName());
                 if(me.getButton()==1){
                     
@@ -117,8 +127,10 @@ public class Tablero extends JFrame{
                 }
                 else if(me.getButton()==3){
                     if(btn.getIcon() == img_bandera){
-                        btn.setText("");
                         bandCount++;
+                        //BufferedImage invisibleIcon = new BufferedImage(img_bandera.getIconWidth(),img_bandera.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+                        //btn.setIcon(new ImageIcon(invisibleIcon));
+                        btn.setIcon(img_transparente);
                     }
                     if(bandCount > 0){
                         if(btn.getIcon() != img_bandera){
@@ -126,18 +138,15 @@ public class Tablero extends JFrame{
                             bandCount--;
                         }
                     }
+                    banderas.setText("X "+bandCount);
                 }
             }
-
             @Override
             public void mousePressed(MouseEvent me) {}
-
             @Override
             public void mouseReleased(MouseEvent me) {}
-
             @Override
             public void mouseEntered(MouseEvent me) {}
-
             @Override
             public void mouseExited(MouseEvent me) {}
         };
@@ -381,18 +390,24 @@ public class Tablero extends JFrame{
         }
         if(perdio == 1){
             puntaje=(width_tab*height_tab)-casillasLibres-noMinas;
+            if(puntaje<0)
+                puntaje=0;
             showPuntuations(puntaje);
         } 
     }
     
     public void showPuntuations(int puntaje){
-        //tablero.dispose();
+        tablero.dispose();
         Conection cn=new Conection(cl.getInetAddress().getHostAddress(), cl.getPort());
         Socket cl2 = cn.connect();
         String alias = JOptionPane.showInputDialog("Tu puntaje ha sido "+puntaje+". Ingresa tu alias para ser registrado en la tabla de puntajes");
         ScoreBoard sc = cn.scoreBoard(cl2, alias, puntaje);
         JFrame puntuaciones = new JFrame("Puntuaciones");
+        puntuaciones.setLayout(null);
+        puntuaciones.setSize(265, 340);
+        puntuaciones.setLocationRelativeTo(null);
         JList lista = new JList();
+        lista.setBounds(5, 5, 240, 250);
         String[] marcador=new String[10];
         for(int i=0; i<10; i++){
             if(sc.getJugadores()[i] != null)
@@ -401,7 +416,27 @@ public class Tablero extends JFrame{
                 break;
         }
         lista.setListData(marcador);
-        puntuaciones.getContentPane().add(lista);
+        Container aux=puntuaciones.getContentPane();
+        aux.add(lista, -1);
+        JButton cerrar=new JButton();
+        cerrar.setText("Cerrar");
+        MouseListener ml=new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                puntuaciones.dispose();
+            }
+            @Override
+            public void mousePressed(MouseEvent me) {}
+            @Override
+            public void mouseReleased(MouseEvent me) {}
+            @Override
+            public void mouseEntered(MouseEvent me) {}
+            @Override
+            public void mouseExited(MouseEvent me) {}
+        };
+        cerrar.addMouseListener(ml);
+        cerrar.setBounds(80, 260, 100, 25);
+        aux.add(cerrar, -1);
         puntuaciones.setVisible(true);
     }
 }

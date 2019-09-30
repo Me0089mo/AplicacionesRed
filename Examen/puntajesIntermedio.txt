@@ -1,9 +1,7 @@
-Lara 157
-Sam 149
-Juan 144
-Rana 140
-Memo 61
-Sal 58
-Roca 2
-Kari 0
-Omar 0
+Ramirez 164
+Oracio 156
+Jamon 136
+Tara 124
+Yolanda 115
+Torres 0
+Katia 0
